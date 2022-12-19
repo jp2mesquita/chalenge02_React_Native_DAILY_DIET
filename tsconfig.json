@@ -4,22 +4,22 @@
     "strict": true,
     "baseUrl": "./",
     "paths": {
-      "@assets": [
+      "@assets/*": [
         "./src/assets/*"
       ],
-      "@components": [
+      "@components/*": [
         "./src/components/*"
       ],
-      "@screens": [
+      "@screens/*": [
         "./src/screens/*"
       ],
-      "@routes": [
+      "@routes/*": [
         "./src/routes/*"
       ],
-      "@storage": [
+      "@storage/*": [
         "./src/storage/*"
       ],
-      "@theme": [
+      "@theme/*": [
         "./src/theme/*"
       ],
     }
