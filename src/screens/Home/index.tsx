@@ -1,8 +1,10 @@
 import { Button } from '@components/Button'
 import { HomeHeader } from '@components/HomeHeader'
 import { useNavigation } from '@react-navigation/native'
+import { useState } from 'react'
 import { SectionList } from 'react-native'
-import { Container, List, ListTitle, MealCard, MealDietStatus, MealHour, MealName, PercentualText, StatisticsCard, Text, Title } from './styles'
+import { useTheme } from 'styled-components/native'
+import { Container, GoFowardIcon, List, ListTitle, MealCard, MealDietStatus, MealHour, MealName, PercentualText, StatisticsCard, Text, Title } from './styles'
 
 type Item = {
   name: string,
@@ -19,9 +21,13 @@ interface DataProps {
 
 
 export function Home(){
+  
+  const [isSuccessAboveFifity, setIsSuccessAboveFifity ] = useState(true)
 
   const { navigate } = useNavigation()
   
+  const { COLORS } = useTheme()
+
   const mealRecordData: DataProps[]= [
     {
       date: '12.08.22',
@@ -69,10 +75,20 @@ export function Home(){
     <Container>
 
       <HomeHeader />
+      
 
       <StatisticsCard
-        onPress={() => navigate('statistics')}
+        onPress={() => navigate('statistics', { isSuccessAboveFifity })}
+        dietSuccessRate={isSuccessAboveFifity}
       >
+        <GoFowardIcon
+          color={isSuccessAboveFifity 
+            ? COLORS.GREEN_DARK 
+            : COLORS.RED_DARK
+          }
+          size={24}
+        />
+
         <PercentualText>
           90,86%
         </PercentualText>
@@ -90,6 +106,7 @@ export function Home(){
       />
 
       <SectionList
+        style={{marginTop: 16}}
         showsVerticalScrollIndicator={false}
         sections={mealRecordData as DataProps[]}
         keyExtractor={(item) => item.name}
@@ -101,21 +118,20 @@ export function Home(){
             </ListTitle>
           ) }
         }
-        renderItem={ ({ item }) => {
-          const hour = item.hour
-          const name = item.name
-          const dietControl = item.dietControl
-
+        renderItem={ ({ item, section }) => {
+          const date = section.date
         return(
-          <MealCard>
+          <MealCard
+            onPress={() => navigate('mealDetails', { item, date })}
+          >
             <MealHour>
-              {hour}
+              {item.hour}
             </MealHour>
             <MealName>
-              {name}
+              {item.name}
             </MealName>
             <MealDietStatus 
-              status={dietControl}
+              status={item.dietControl}
             />
           </MealCard>
           

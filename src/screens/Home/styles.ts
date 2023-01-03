@@ -1,5 +1,5 @@
-import theme from "@theme/index";
-import { SectionList } from "react-native";
+import { ArrowUpRight, IconProps } from "phosphor-react-native";
+import { SectionList, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled, { css } from "styled-components/native";
 
@@ -10,8 +10,11 @@ export const Container = styled(SafeAreaView)`
 
   padding: 24px;
 `
+interface StatisticsProps {
+  dietSuccessRate: boolean
+}
 
-export const StatisticsCard =  styled.TouchableOpacity`
+export const StatisticsCard =  styled.TouchableOpacity<StatisticsProps>`
   width: 100%;
   padding-top: 20px;
   padding-bottom: 20px;
@@ -22,11 +25,20 @@ export const StatisticsCard =  styled.TouchableOpacity`
   align-items: center;
   justify-content: center;
   
-  ${({ theme }) => css`
-    background-color: ${theme.COLORS.GREEN_LIGHT};
-  `}
+  background-color: ${({theme, dietSuccessRate}) =>
+    dietSuccessRate 
+      ? theme.COLORS.GREEN_LIGHT
+      : theme.COLORS.RED_LIGHT
+  };
   border: none;
   border-radius: 6px;
+`
+
+
+export const GoFowardIcon = styled(ArrowUpRight)`
+  position: absolute;
+  top: 8px;
+  right: 8px;
 `
 
 export const PercentualText = styled.Text`
@@ -70,7 +82,7 @@ export const ListTitle = styled.Text`
   margin-bottom: 12px;
 `
 
-export const MealCard = styled.View`
+export const MealCard = styled(TouchableOpacity)`
   width: 100%;
   flex-direction: row;
 
