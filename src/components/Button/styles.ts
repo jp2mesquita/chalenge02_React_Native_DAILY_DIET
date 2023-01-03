@@ -10,6 +10,8 @@ interface ButtonProps{
 export const Container = styled(TouchableOpacity)<ButtonProps>`
   width: 100%;
 
+  flex-direction: row;
+
   background-color: ${({ theme, type }) => 
     type === 'PRIMARY'
     ? theme.COLORS.GRAY_200
