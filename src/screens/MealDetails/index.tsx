@@ -1,7 +1,7 @@
 import { Button } from "@components/Button";
 import { Tag } from "@components/Tag";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Text, View } from "react-native";
+import { Text } from "react-native";
 import { BackButton, BackIcon, ButtonsBox, Container, Content, Header, Subtitle, Title } from "./styles";
 
 interface RouteParams{
