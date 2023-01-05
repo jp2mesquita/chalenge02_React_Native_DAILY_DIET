@@ -70,7 +70,11 @@ export function Home(){
       ]
     }
   ]
-   
+  
+  function handleOpenNewMealScreen(){
+    navigate('newMeal')
+  }
+
   return (
     <Container>
 
@@ -103,6 +107,7 @@ export function Home(){
 
       <Button 
         title='Nova Refeição'
+        onPress={handleOpenNewMealScreen}
       />
 
       <SectionList
