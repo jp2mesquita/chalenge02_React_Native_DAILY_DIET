@@ -67,7 +67,7 @@ export const Subtitle = styled.Text`
   ${({ theme }) => css`
     color: ${theme.COLORS.GRAY_100};
     font-family: ${theme.FONT_FAMILY.BOLD};
-    font-size: ${theme.FONT_SIZE.SM};
+    font-size: ${theme.FONT_SIZE.SM}px;
   `};
   margin-top: 24px;
   margin-bottom: 8px;
