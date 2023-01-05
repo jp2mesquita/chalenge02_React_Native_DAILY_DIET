@@ -16,6 +16,10 @@ export declare global {
         item: MealDetailsProps, 
         date: string
       }
+      newMeal: undefined
+      registrationSuccess: {
+        dietControl: 'INSIDE' | 'OUTSIDE'
+      }
     }
   }
 }
