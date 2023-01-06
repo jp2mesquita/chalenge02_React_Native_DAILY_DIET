@@ -9,9 +9,12 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { differenceInMonths, format } from "date-fns";
 import { formatDateToString } from "@utils/formatDateToString";
-import { formatTimeToString } from "@utils/formatTimeToString";
 
 
+import { MealListProps } from "@screens/Home";
+import { MealDetailsProps } from "src/@types/navigation";
+import { registerNewMeal } from "@storage/meal/registerNewMeal";
+import { formatDateTimeToHourInString } from "@utils/formatDateTimeToHourInString";
 
 export function NewMeal({...rest} : TextInputProps){
   const { navigate } = useNavigation()
@@ -34,12 +37,32 @@ export function NewMeal({...rest} : TextInputProps){
   const newDateInputRef = useRef<TextInput>(null)
   const newHourInputRef = useRef<TextInput>(null)
 
+  const [ newMeal, setNewMeal ] = useState<MealListProps[]>([])
+
   function handleGoBackToHome(){
     navigate('home')
   }
 
   function handleRegisterNewMeal(){
-    navigate('registrationSuccess', {dietControl})
+    
+    const date = newDate
+    const data = {
+      name: newName,
+      description: newDescription,
+      hour: newTime,
+      dietControl: dietControl
+    }
+
+    const mealToRegister = {
+      date,
+      data,
+    }
+
+    // console.log(mealToRegister)
+
+    registerNewMeal(date, data)
+
+    navigate('registrationSuccess', { mealToRegister })
   }
 
   function showDatePicker() {
@@ -66,7 +89,7 @@ export function NewMeal({...rest} : TextInputProps){
   };
 
   function handleTimeConfirm(time: Date){
-    const timeToAdd = formatTimeToString(time)
+    const timeToAdd = formatDateTimeToHourInString(time)
     setNewTime(timeToAdd)
 
     hideTimePicker();
