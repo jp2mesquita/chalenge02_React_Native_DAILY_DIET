@@ -2,17 +2,17 @@ import { Button } from "@components/Button";
 import { DietControlButton } from "@components/DietControlButton";
 import { useNavigation, useScrollToTop } from "@react-navigation/native";
 import { useRef, useState } from "react";
-import { Platform, Text, TextInput, TextInputChangeEventData, TextInputProps, View } from "react-native";
+import { Text, TextInput, TextInputProps, View } from "react-native";
 import { BackButton, BackIcon, ButtonBox, Container, Content, DataInput, DescriptionInput, Header, HorizontalBox, HourInput, Label, NameInput, Separator } from "./styles";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-import { differenceInMonths, format } from "date-fns";
+
 import { formatDateToString } from "@utils/formatDateToString";
 
 
 import { MealListProps } from "@screens/Home";
-import { MealDetailsProps } from "src/@types/navigation";
+
 import { registerNewMeal } from "@storage/meal/registerNewMeal";
 import { formatDateTimeToHourInString } from "@utils/formatDateTimeToHourInString";
 
@@ -37,8 +37,6 @@ export function NewMeal({...rest} : TextInputProps){
   const newDateInputRef = useRef<TextInput>(null)
   const newHourInputRef = useRef<TextInput>(null)
 
-  const [ newMeal, setNewMeal ] = useState<MealListProps[]>([])
-
   function handleGoBackToHome(){
     navigate('home')
   }
@@ -57,8 +55,6 @@ export function NewMeal({...rest} : TextInputProps){
       date,
       data,
     }
-
-    // console.log(mealToRegister)
 
     registerNewMeal(date, data)
 
