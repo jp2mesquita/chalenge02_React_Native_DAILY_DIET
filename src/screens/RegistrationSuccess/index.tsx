@@ -7,9 +7,13 @@ import { Container, Subtitle, Title } from "./styles";
 
 import succesImg from '@assets/success.png'
 import failImg from '@assets/fail.png'
+import { MealDetailsProps } from "src/@types/navigation";
 
 interface RouteParams{
-  dietControl: 'INSIDE' | 'OUTSIDE'
+  mealToRegister: {
+    date: string;
+    data: MealDetailsProps
+  }
 }
 
 
@@ -17,7 +21,7 @@ export function RegistrationSuccess(){
   const { navigate } = useNavigation()
 
   const route = useRoute()
-  const { dietControl } = route.params as RouteParams
+  const { mealToRegister } = route.params as RouteParams
 
   function handleGoToHome(){
     navigate('home')
@@ -32,6 +36,8 @@ export function RegistrationSuccess(){
     "hardwareBackPress",
     backAction
   )
+
+  const dietControl = mealToRegister.data.dietControl
 
   return(
     <Container>
