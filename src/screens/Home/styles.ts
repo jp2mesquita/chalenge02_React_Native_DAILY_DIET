@@ -16,6 +16,7 @@ interface StatisticsProps {
 
 export const StatisticsCard =  styled.TouchableOpacity<StatisticsProps>`
   width: 100%;
+  min-height: 102px;
   padding-top: 20px;
   padding-bottom: 20px;
   padding-inline: 16px;

@@ -1,8 +1,14 @@
 import { Button } from '@components/Button'
 import { HomeHeader } from '@components/HomeHeader'
-import { useNavigation } from '@react-navigation/native'
-import { useState } from 'react'
+import { Loading } from '@components/Loading'
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'
+import { getAllDates } from '@storage/date/getAllDates'
+import { getAllMealsByDate } from '@storage/meal/getAllMealsByDate'
+import { formatStringToDateInTimestamp } from '@utils/formatStringToDateInTimestamp'
+import { formatTimeToSeconds } from '@utils/formatTimeToNumber'
+import { useCallback, useEffect, useState } from 'react'
 import { SectionList } from 'react-native'
+import { MealDetailsProps } from 'src/@types/navigation'
 import { useTheme } from 'styled-components/native'
 import { Container, GoFowardIcon, List, ListTitle, MealCard, MealDietStatus, MealHour, MealName, PercentualText, StatisticsCard, Text, Title } from './styles'
 
@@ -14,7 +20,7 @@ type Item = {
 
 }
 
-interface DataProps {
+export interface MealListProps {
   date: string,
   data: Item[]
 }
@@ -22,65 +28,63 @@ interface DataProps {
 
 export function Home(){
   
-  const [isSuccessAboveFifity, setIsSuccessAboveFifity ] = useState(true)
-
   const { navigate } = useNavigation()
   
   const { COLORS } = useTheme()
 
-  const mealRecordData: DataProps[]= [
-    {
-      date: '12.08.22',
-      data: [
-        {
-          name: 'Vitamina de Banana',
-          description: 'Vitamina de banana com morango',
-          hour: '09:30',
-          dietControl: 'INSIDE'
-        },
-        {
-          name: 'X-TUDO',
-          description: 'Xis completo da lancheria do bairro',
-          hour: '16:30',
-          dietControl: 'OUTSIDE'
-        },
-      ]
-    },
-    {
-      date: '11.08.22',
-      data: [
-        {
-          name: 'Vitamina de abacate',
-          description: 'Vitamina de abacate com morango',
-          hour: '09:30',
-          dietControl: 'INSIDE'
-        },
-        {
-          name: 'Almoço fitness',
-          description: 'Frango Grelhado e Arror',
-          hour: '16:30',
-          dietControl: 'INSIDE'
-        },
-        {
-          name: 'Shake poś-treino',
-          description: 'whey protein, banana, aveia, leite',
-          hour: '20:30',
-          dietControl: 'INSIDE'
-        },
-      ]
-    }
-  ]
+  const [isSuccessAboveFifity, setIsSuccessAboveFifity ] = useState(true)
+  const [ isLoading, setIsLoading ] = useState(true)
+
+  const [ mealList, setMealList] = useState <MealListProps[]>([])
+
+  function sortMealList(listToSort: MealListProps[]){
+    listToSort.forEach(item => item.data.sort(function(a, b){return formatTimeToSeconds(a.hour) - formatTimeToSeconds(b.hour)}))
   
+    listToSort.sort((a,b) => formatStringToDateInTimestamp(b.date) - formatStringToDateInTimestamp(a.date));
+  }
+
+  async function fetchAllMeals(allDates: string[]){
+    let newList: MealListProps[] = []
+    allDates.forEach( async (item, index, array) => {
+      const data = await getAllMealsByDate(item)
+      const newItem = {
+        date: item,
+        data: data
+      }
+      newList = [...newList, newItem]
+      if(array.length === index+1) { 
+        sortMealList(newList) 
+        setMealList(newList)
+      }
+    })
+  }
+
+  async function fetchMealList(){
+    try {
+      setIsLoading(true)
+      const allDates = await getAllDates()
+      fetchAllMeals(allDates)
+    } catch (error) {
+      throw error
+    }finally{
+      setIsLoading(false)
+    }
+  }
+  
+
   function handleOpenNewMealScreen(){
     navigate('newMeal')
   }
+
+  useFocusEffect(useCallback( () => {
+    fetchMealList()
+  }, []))
 
   return (
     <Container>
 
       <HomeHeader />
       
-
       <StatisticsCard
         onPress={() => navigate('statistics', { isSuccessAboveFifity })}
         dietSuccessRate={isSuccessAboveFifity}
@@ -93,9 +97,13 @@ export function Home(){
           size={24}
         />
 
-        <PercentualText>
-          90,86%
-        </PercentualText>
+        { isLoading
+          ? null
+          : <PercentualText>
+              90,86%
+            </PercentualText>
+        }
+        
         <Text>
           das refeições dentro da dieta
         </Text>
@@ -110,38 +118,41 @@ export function Home(){
         onPress={handleOpenNewMealScreen}
       />
 
-      <SectionList
-        style={{marginTop: 16}}
-        showsVerticalScrollIndicator={false}
-        sections={mealRecordData as DataProps[]}
-        keyExtractor={(item) => item.name}
-        renderSectionHeader= { ({section: { date }}) => {
+      { isLoading
+        ? <Loading/>
+        : <SectionList
+            style={{marginTop: 16}}
+            showsVerticalScrollIndicator={false}
+            sections={mealList as MealListProps[]}
+            keyExtractor={(item) => item.name}
+            renderSectionHeader= { ({section: { date }}) => {
 
-          return(
-            <ListTitle>
-              {date}  
-            </ListTitle>
-          ) }
-        }
-        renderItem={ ({ item, section }) => {
-          const date = section.date
-        return(
-          <MealCard
-            onPress={() => navigate('mealDetails', { item, date })}
-          >
-            <MealHour>
-              {item.hour}
-            </MealHour>
-            <MealName>
-              {item.name}
-            </MealName>
-            <MealDietStatus 
-              status={item.dietControl}
-            />
-          </MealCard>
-          
-        )}}
-      />
+              return(
+                <ListTitle>
+                  {date}  
+                </ListTitle>
+              ) }
+            }
+            renderItem={ ({ item, section }) => {
+              const date = section.date
+            return(
+              <MealCard
+                onPress={() => navigate('mealDetails', { item, date })}
+              >
+                <MealHour>
+                  {item.hour}
+                </MealHour>
+                <MealName>
+                  {item.name}
+                </MealName>
+                <MealDietStatus 
+                  status={item.dietControl}
+                />
+              </MealCard>
+              
+            )}}
+          />
+      }
 
     </Container>
   )
