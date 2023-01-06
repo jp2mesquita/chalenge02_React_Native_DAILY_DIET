@@ -1,6 +1,6 @@
 import { format } from 'date-fns'
 
-export function formatTimeToString(time: Date){
+export function formatDateTimeToHourInString(time: Date){
   
   const newTime = format(time, "kk':'mm")
 
