@@ -1,8 +1,13 @@
-type MealDetailsProps = {
+export type MealDetailsProps = {
   name: string,
   description: string,
   hour: string,
   dietControl: 'INSIDE' | 'OUTSIDE'
+}
+
+type MealToRegisterProps = {
+  date: string,
+  data: MealDetailsProps
 }
 
 export declare global {
@@ -18,7 +23,7 @@ export declare global {
       }
       newMeal: undefined
       registrationSuccess: {
-        dietControl: 'INSIDE' | 'OUTSIDE'
+        mealToRegister: MealToRegisterProps
       }
     }
   }
