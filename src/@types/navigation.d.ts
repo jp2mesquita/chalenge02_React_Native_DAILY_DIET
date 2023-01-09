@@ -1,3 +1,5 @@
+import { MetricsProps } from "@screens/Home"
+
 export type MealDetailsProps = {
   name: string,
   description: string,
@@ -15,13 +17,18 @@ export declare global {
     interface  RootParamList {
       home: undefined
       statistics: {
-        isSuccessAboveFifity: boolean
+        isSuccessAboveSeventyFive: boolean
+        metrics: MetricsProps
       }
       mealDetails: {
         item: MealDetailsProps, 
         date: string
       }
       newMeal: undefined
+      mealEdit: {
+        data: MealDetailsProps, 
+        date: string
+      }
       registrationSuccess: {
         mealToRegister: MealToRegisterProps
       }
