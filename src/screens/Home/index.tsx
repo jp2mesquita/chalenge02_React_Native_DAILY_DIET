@@ -6,6 +6,7 @@ import { getAllDates } from '@storage/date/getAllDates'
 import { getAllMealsByDate } from '@storage/meal/getAllMealsByDate'
 import { formatStringToDateInTimestamp } from '@utils/formatStringToDateInTimestamp'
 import { formatTimeToSeconds } from '@utils/formatTimeToNumber'
+import { mealsInsideTheDietPercentage } from '@utils/metrics/insidePercentage'
 import { useCallback, useEffect, useState } from 'react'
 import { SectionList } from 'react-native'
 import { MealDetailsProps } from 'src/@types/navigation'
@@ -25,6 +26,13 @@ export interface MealListProps {
   data: Item[]
 }
 
+export interface MetricsProps{
+  insideAmount: number;
+  outsideAmount: number;
+  total: number;
+  insidePercentage: number;
+  biggestInsideStreak: number;
+}
 
 export function Home(){
   
@@ -32,8 +40,9 @@ export function Home(){
   
   const { COLORS } = useTheme()
 
-  const [isSuccessAboveFifity, setIsSuccessAboveFifity ] = useState(true)
+  const [isSuccessAboveSeventyFive, setIsSuccessAboveSeventyFive ] = useState(true)
   const [ isLoading, setIsLoading ] = useState(true)
+
 
   const [ mealList, setMealList] = useState <MealListProps[]>([])
 
@@ -54,9 +63,28 @@ export function Home(){
       newList = [...newList, newItem]
       if(array.length === index+1) { 
         sortMealList(newList) 
-        setMealList(newList)
+        newList != mealList && setMealList(newList)
       }
     })
+  }
+
+
+  const [metrics, setMetrics ] = useState<MetricsProps>({} as MetricsProps)
+
+  function checkIfSuccessIsAboveSeventyFive(metricsResult: MetricsProps){
+    metricsResult.insidePercentage >= 75 
+        ? setIsSuccessAboveSeventyFive(true) 
+        : setIsSuccessAboveSeventyFive(false)
+  }
+
+  function metricsCalculator(){
+    
+    const metricsResult = mealsInsideTheDietPercentage(mealList)
+    checkIfSuccessIsAboveSeventyFive(metricsResult)
+    
+    setMetrics(metricsResult)
+    
+
   }
 
   async function fetchMealList(){
@@ -64,6 +92,7 @@ export function Home(){
       setIsLoading(true)
       const allDates = await getAllDates()
       fetchAllMeals(allDates)
+
     } catch (error) {
       throw error
     }finally{
@@ -78,7 +107,12 @@ export function Home(){
 
   useFocusEffect(useCallback( () => {
     fetchMealList()
+    
   }, []))
+
+  useEffect(() => {
+    !isLoading && metricsCalculator()
+  }, [mealList])
 
   return (
     <Container>
@@ -86,11 +120,11 @@ export function Home(){
       <HomeHeader />
       
       <StatisticsCard
-        onPress={() => navigate('statistics', { isSuccessAboveFifity })}
-        dietSuccessRate={isSuccessAboveFifity}
+        onPress={() => navigate('statistics', { metrics, isSuccessAboveSeventyFive  })}
+        dietSuccessRate={isSuccessAboveSeventyFive}
       >
         <GoFowardIcon
-          color={isSuccessAboveFifity 
+          color={isSuccessAboveSeventyFive 
             ? COLORS.GREEN_DARK 
             : COLORS.RED_DARK
           }
@@ -100,7 +134,7 @@ export function Home(){
         { isLoading
           ? null
           : <PercentualText>
-              90,86%
+              {metrics.insidePercentage}%
             </PercentualText>
         }
         
