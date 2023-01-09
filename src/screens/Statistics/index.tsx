@@ -7,10 +7,12 @@ import { Text } from 'react-native'
 
 import { BackButton, BackIcon, ColoredCardsContainer, Container, Content, Header, Percent, Separator, Title } from './styles'
 import { useTheme } from 'styled-components/native'
+import { MetricsProps } from '@screens/Home'
 
 
 type RouteParams = {
-  isSuccessAboveFifity: boolean
+  metrics: MetricsProps
+  isSuccessAboveSeventyFive: boolean
 }
 
 export function Statistics(){
@@ -18,7 +20,7 @@ export function Statistics(){
   const { navigate } = useNavigation()
 
   const route = useRoute()
-  const { isSuccessAboveFifity } = route.params as RouteParams
+  const { metrics, isSuccessAboveSeventyFive } = route.params as RouteParams
 
   const { COLORS } = useTheme()
   
@@ -27,13 +29,13 @@ export function Statistics(){
   }
 
   return (
-    <Container dietSuccessRate={isSuccessAboveFifity}>
+    <Container dietSuccessRate={isSuccessAboveSeventyFive}>
       <Header>
         <BackButton
           onPress={handleGoBack}
         >
           <BackIcon 
-            color= { isSuccessAboveFifity
+            color= { isSuccessAboveSeventyFive
               ? COLORS.GREEN_DARK
               : COLORS.RED_DARK
             }
@@ -41,7 +43,7 @@ export function Statistics(){
         </BackButton>
 
         <Percent>
-          90,86%
+          {metrics.insidePercentage}%
         </Percent>
         <Text>
           das refeições dentro da dieta
@@ -54,18 +56,18 @@ export function Statistics(){
         </Title>
 
         <RegularStatisticCard
-          title='22'
+          title={String(metrics.biggestInsideStreak)}
           text='melhor sequencia de pratos dentro da dieta'
         />
 
         <RegularStatisticCard
-          title='109'
+          title={String(metrics.total)}
           text='refeições registradas'
         />
 
         <ColoredCardsContainer>
           <ColoredStatisticCard
-            title='99' 
+            title={String(metrics.insideAmount)}
             text='refeições dentro da dieta'
             type='INSIDE'
           />
@@ -73,7 +75,7 @@ export function Statistics(){
           <Separator />
 
           <ColoredStatisticCard
-            title='10' 
+            title={String(metrics.outsideAmount)}
             text='refeições fora da dieta'
             type='OUTSIDE'
           />
